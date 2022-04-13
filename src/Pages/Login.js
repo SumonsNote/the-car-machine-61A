@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { useSendPasswordResetEmail, useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import auth from './../firebase.init';
+import SocialLogin from './SocialLogin';
 
 const Login = () => {
 
@@ -20,6 +21,20 @@ const Login = () => {
         error,
     ] = useSignInWithEmailAndPassword(auth);
 
+    const [sendPasswordResetEmail, sending] = useSendPasswordResetEmail(
+        auth
+      );
+
+    let errorElement;
+
+    if (error) {
+        errorElement = 
+          <div>
+            <p className='text-danger'>Error: {error?.message}</p>
+          </div>
+
+      }
+
     if (user) {
         navigate(from, { replace: true });
     }
@@ -35,27 +50,31 @@ const Login = () => {
     const navigateRegister = event => {
         navigate('/register');
     }
+
+    const navigateResetPassword = async() => {
+        const email = emailRef.current.value;
+        await sendPasswordResetEmail(email);
+        alert('Sent email');
+    }
     return (
         <div className='container mx-auto w-25 mt-5'>
             <Form onSubmit={handleSubmit}>
-            <h2 className='text-primary'>PleaseLogin</h2>
+            <h2 className='text-primary'>Please Login</h2>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label  className='float-start'>Email address</Form.Label>
-                    <Form.Control ref={emailRef} type="email" placeholder="Enter email" required />
+                    <Form.Control ref={emailRef} type="email" placeholder="Enter email" />
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label  className='float-start'>Password</Form.Label>
-                    <Form.Control ref={passRef} type="password" placeholder="Password" required />
+                    <Form.Control ref={passRef} type="password" placeholder="Password" />
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                    <Form.Check type="checkbox" label="Check me out" />
-                </Form.Group>
-                <Button variant="primary" type="submit">
+                {errorElement}
+                <Button className='w-50 mx-auto my-3' variant="primary" type="submit">
                     Login
                 </Button>
             </Form>
-            <Link to='/register' onClick={navigateRegister}>Create a new account</Link>
+            <p>Are you new? <Link to='/register' onClick={navigateRegister}>Create a new account</Link></p>
+            <p>Forget Password? <Link to='/register' onClick={navigateResetPassword}>Reset Password</Link></p>
+            <SocialLogin></SocialLogin>
         </div>
     );
 };
