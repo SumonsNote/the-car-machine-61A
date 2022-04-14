@@ -5,6 +5,7 @@ import github from '../images/github.png'
 import { useSignInWithGithub, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import auth from './../firebase.init';
 import { useNavigate } from 'react-router-dom';
+import Loading from './Loading';
 
 const SocialLogin = () => {
     const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
@@ -20,6 +21,10 @@ const SocialLogin = () => {
           </div>
 
       }
+
+      if(loading || loading1) {
+        return <Loading></Loading>
+    }
 
       if(user || user1) {
           navigate('/home')
